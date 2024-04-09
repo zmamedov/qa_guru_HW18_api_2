@@ -1,5 +1,8 @@
+import logging
+
 import allure
 import requests
+from allure_commons.types import AttachmentType
 from selene import browser, have
 
 from tests.conftest import auth_with_api, URL
@@ -10,6 +13,9 @@ def add_product_to_cart(product_url, cookie):
         url=URL + product_url,
         cookies={"NOPCOMMERCE.AUTH": cookie}
     )
+    allure.attach(body=response.text, name='Response', attachment_type=AttachmentType.TEXT, extension='.txt')
+    logging.info(response.status_code)
+    logging.info(response.text)
 
     return response.status_code
 

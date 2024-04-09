@@ -1,5 +1,7 @@
+import allure
 import pytest
 import requests
+from allure_commons.types import AttachmentType
 from selene import browser
 
 EMAIL = 'john12_3@gmail.com'
@@ -14,6 +16,8 @@ def auth_with_api():
         allow_redirects=False
     )
     cookie = response_auth.cookies.get("NOPCOMMERCE.AUTH")
+    allure.attach(body=response_auth.text, name='Response', attachment_type=AttachmentType.TEXT, extension='.txt')
+    allure.attach(body=cookie, name='Cookie', attachment_type=AttachmentType.TEXT, extension='.txt')
 
     return cookie
 
