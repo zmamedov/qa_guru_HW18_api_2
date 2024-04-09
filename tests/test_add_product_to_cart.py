@@ -1,3 +1,4 @@
+import allure
 import requests
 from selene import browser, have
 
@@ -18,29 +19,44 @@ def clear_cart():
 
 
 def test_cart_should_have_added_product():
-    cookie = auth_with_api()
-    browser.open('/')
-    browser.driver.add_cookie({"name": "NOPCOMMERCE.AUTH", "value": cookie})
-    browser.open('/')
+    with allure.step('Авторизоваться через API.'):
+        cookie = auth_with_api()
 
-    response_code = add_product_to_cart(product_url='/addproducttocart/catalog/45/1/1', cookie=cookie)
-    assert response_code == 200
+    with allure.step('Открыть страницу интерент-магазина "Demo Web Shop".'):
+        browser.open('/')
+        browser.driver.add_cookie({"name": "NOPCOMMERCE.AUTH", "value": cookie})
+        browser.open('/')
 
-    browser.element('.ico-cart .cart-label').click()
-    browser.element('.product-name').should(have.exact_text('Fiction'))
+    with allure.step('Добавить товар в корзину через API.'):
+        response_code = add_product_to_cart(product_url='/addproducttocart/catalog/45/1/1', cookie=cookie)
+        assert response_code == 200
 
-    clear_cart()
+    with allure.step('Проверить, что в корзине содержится добавленный товар.'):
+        browser.element('.ico-cart .cart-label').click()
+        browser.element('.product-name').should(have.exact_text('Fiction'))
+
+    with allure.step('Очистить корзину.'):
+        clear_cart()
 
 
 def test_clear_cart():
-    cookie = auth_with_api()
-    browser.open('/')
-    browser.driver.add_cookie({"name": "NOPCOMMERCE.AUTH", "value": cookie})
-    browser.open('/')
+    with allure.step('Авторизоваться через API.'):
+        cookie = auth_with_api()
 
-    response_code = add_product_to_cart(product_url='/addproducttocart/catalog/45/1/1', cookie=cookie)
-    assert response_code == 200
-    browser.element('.ico-cart .cart-label').click()
-    clear_cart()
+    with allure.step('Открыть страницу интерент-магазина "Demo Web Shop".'):
+        browser.open('/')
+        browser.driver.add_cookie({"name": "NOPCOMMERCE.AUTH", "value": cookie})
+        browser.open('/')
 
-    browser.element('.order-summary-content').should(have.text('Your Shopping Cart is empty!'))
+    with allure.step('Добавить товар в корзину через API.'):
+        response_code = add_product_to_cart(product_url='/addproducttocart/catalog/45/1/1', cookie=cookie)
+        assert response_code == 200
+
+    with allure.step('Проверить, что в корзине содержится добавленный товар.'):
+        browser.element('.ico-cart .cart-label').click()
+
+    with allure.step('Очистить корзину.'):
+        clear_cart()
+
+    with allure.step('Проверить, что корзина пустая.'):
+        browser.element('.order-summary-content').should(have.text('Your Shopping Cart is empty!'))
